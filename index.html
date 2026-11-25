@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eaf4ff">
+  <title>メッセージをひらく</title>
+  <style>
+    :root { --blue:#a9d0ff; --blue-deep:#789bc8; --ink:#51463f; --cream:#fffdf9; }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-height:100svh; display:grid; place-items:center; padding:28px 18px;
+      color:var(--ink); font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", system-ui, sans-serif;
+      background: radial-gradient(ellipse at 50% 35%, #fffefa 0 48%, transparent 75%),
+                  linear-gradient(180deg,#e8f3ff,#fffdf9 28%,#fffdf9 76%,#e8f3ff);
+      overflow-x:hidden;
+    }
+    body:before, body:after { content:""; position:fixed; left:-8%; width:116%; height:70px; pointer-events:none; opacity:.8;
+      background: repeating-linear-gradient(90deg, transparent 0 28px, #b9d8ff 28px 52px, transparent 52px 78px);
+      filter:blur(18px); }
+    body:before { top:-48px; } body:after { bottom:-48px; }
+    .wrap { width:min(100%,520px); text-align:center; position:relative; padding:24px 12px 30px; }
+    .spark { position:absolute; color:#f2c94c; font-size:25px; }
+    .s1{top:85px;left:8%;}.s2{top:145px;right:9%;}.s3{top:330px;left:4%;}
+    .angel { width:min(66vw,285px); height:300px; object-fit:contain; display:block; margin:0 auto 5px; filter:drop-shadow(0 7px 2px #dce8f3); animation: angel-float 2.8s ease-in-out infinite; transform-origin:50% 60%; }
+    @keyframes angel-float {
+      0%,100% { transform:translateY(0) rotate(-2deg); }
+      50% { transform:translateY(-16px) rotate(2deg); }
+    }
+    .spark { animation: twinkle 1.8s ease-in-out infinite alternate; }
+    .s2 { animation-delay:.5s; }
+    .s3 { animation-delay:1s; }
+    @keyframes twinkle { from { opacity:.35; transform:scale(.8) rotate(0deg); } to { opacity:1; transform:scale(1.25) rotate(18deg); } }
+    @media (prefers-reduced-motion: reduce) { .angel,.spark { animation:none; } }
+    h1 { font-size:clamp(27px,7vw,39px); line-height:1.35; margin:0 0 12px; letter-spacing:.04em; font-weight:900; text-shadow:2px 2px 0 #fff; }
+    .sub { font-size:15px; letter-spacing:.12em; margin:0 0 26px; font-weight:700; }
+    input { width:min(100%,360px); height:62px; border:3px solid #9db2cf; border-radius:22px; background:#fff; text-align:center; font-size:25px; letter-spacing:.22em; color:var(--ink); outline:none; box-shadow:0 4px 0 #e2eaf3; }
+    input:focus { border-color:#78a9e4; }
+    button { display:block; width:min(100%,310px); margin:25px auto 0; border:0; border-radius:18px; padding:17px 20px; color:#405a7b; font-size:25px; font-weight:900; letter-spacing:.2em; background:linear-gradient(#c9e2ff,#9fcaff); box-shadow:0 6px 0 #779ac5, inset 0 3px 0 #edf7ff; cursor:pointer; }
+    button:active { transform:translateY(4px); box-shadow:0 2px 0 #779ac5; }
+    .error { min-height:25px; margin:16px 0 0; color:#bf7777; font-size:14px; font-weight:700; }
+    .message { display:none; margin:24px auto 0; padding:24px 20px; max-width:420px; border:2px dashed #a9c8e9; border-radius:22px; background:#fff; line-height:1.9; white-space:pre-wrap; font-size:17px; }
+    .message h2 { margin:0 0 12px; font-size:22px; }
+    .tiny { margin-top:25px; font-size:11px; color:#9b9b9b; letter-spacing:.08em; }
+    @media(max-height:760px){.angel{height:235px}.s1,.s2{top:60px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <span class="spark s1">✦</span><span class="spark s2">✧</span><span class="spark s3">✦</span>
+    <img class="angel" src="angel.png" alt="天使のキャラクター">
+    <h1>メッセージをひらく</h1>
+    <p class="sub">すうじを にゅうりょくしてね</p>
+    <form id="unlockForm">
+      <input id="code" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="すうじをいれてね" aria-label="番号を入力" autocomplete="off">
+      <button type="submit">ひらく　▶</button>
+    </form>
+    <p class="error" id="error" aria-live="polite"></p>
+    <section class="message" id="message" aria-live="polite">
+      <h2>💌 あなたへのメッセージ</h2>
+      <div id="messageText"></div>
+    </section>
+    <p class="tiny">あなたへの とくべつな おてがみ</p>
+  </main>
+  <script>
+    // ここを書きかえると、表示するメッセージを編集できます。
+    const ACCESS_NUMBER = "1124";
+    const MESSAGE = "ここにメッセージを入力してね。\n\nいつもありがとう！";
+
+    document.getElementById('unlockForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const entered = document.getElementById('code').value.trim();
+      const error = document.getElementById('error');
+      const message = document.getElementById('message');
+      if (entered === ACCESS_NUMBER) {
+        error.textContent = '';
+        document.getElementById('messageText').textContent = MESSAGE;
+        message.style.display = 'block';
+        document.getElementById('unlockForm').style.display = 'none';
+        document.querySelector('.sub').style.display = 'none';
+        message.scrollIntoView({behavior:'smooth', block:'center'});
+      } else {
+        message.style.display = 'none';
+        error.textContent = 'ばんごうがちがうみたい。もういちどためしてね！';
+      }
+    });
+  </script>
+</body>
+</html>
